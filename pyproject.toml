@@ -9,9 +9,6 @@ license = {text = "MIT"}
 readme = "README.md"
 requires-python = ">=3.10"
 
-[tool.poetry.scripts]
-lnco-transcribe = "lnco_transcribe.src.run_diarize:main"
-
 [tool.poetry.dependencies]
 wget = "^3.2"
 nemo-toolkit = {version = "2.0.0rc0", extras = ["asr"]}
@@ -23,6 +20,9 @@ ctc-forced-aligner = {git = "https://github.com/MahmoudAshraf97/ctc-forced-align
 ipykernel = "^6.29.5"
 pandas = "^2.2.3"
 pydub = "^0.25.1"
+
+[tool.poetry.scripts]
+lnco-transcribe = "lnco_transcribe.run_diarize:main"
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
