@@ -42,6 +42,11 @@ Ensure that FFMPEG is added to your system’s PATH.
 ```
 pip install lnco-transcribe
 ``` 
+OR
+If Pypi version don't working:
+```
+pip install .\dist\lnco_transcribe-1.0.0-py3-none-any.whl
+```
 
 ## 2.2 Install Manually with a Virtual Environment
 
