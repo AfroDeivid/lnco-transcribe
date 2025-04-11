@@ -11,16 +11,11 @@ Developed by [David Friou](https://github.com/AfroDeivid) as part of a semester 
 
 ## Table of Contents
 1. [Installation](#installation)  
-   1. [Prerequisites](#1-prerequisites)  
-   2. [Installing Required Packages](#2-installing-required-packages)  
 2. [Usage](#usage)  
    1. [Preparing Your Data](#preparing-your-data)  
    2. [Transcription & Diarization (Audio-to-Text)](#transcription--diarization-audio-to-text)  
    3. [Outputs](#outputs)  
 3. [File Structure](#file-structure)  
-   1. [Audio-to-Text Processing](#audio-to-text-processing)  
-   2. [Transcript Evaluation](#transcript-evaluation)  
-   3. [Text and Topic Analysis](#text-and-topic-analysis) 
 4. [Mentions](#mentions)
 
 # Installation
