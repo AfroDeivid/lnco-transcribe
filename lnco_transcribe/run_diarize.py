@@ -31,7 +31,8 @@ def process_audio_file(audio_file, directory, whisper_model, language, task=None
     start_time = time.time()
 
     command = [
-        "python", "src\whisper_diarization\diarize.py",
+        "python",
+        os.path.join(os.path.dirname(__file__), 'whisper_diarization', 'diarize.py'),
         "-a", audio_file,
         "-d", output_dir,
         "--whisper-model", whisper_model,

@@ -20,6 +20,8 @@ ctc-forced-aligner = {git = "https://github.com/MahmoudAshraf97/ctc-forced-align
 ipykernel = "^6.29.5"
 pandas = "^2.2.3"
 pydub = "^0.25.1"
+huggingface-hub = "0.23.5"
+numpy = "1.26.4"
 
 [tool.poetry.scripts]
 lnco-transcribe = "lnco_transcribe.run_diarize:main"

@@ -51,3 +51,6 @@ rad.json
 *.g.xlf
 #License-file
 *.flf
+
+# intellij
+.idea
