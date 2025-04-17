@@ -2,6 +2,7 @@ import os
 import subprocess
 import time
 import argparse
+import sys
 
 from lnco_transcribe.utils.format_helpers import get_files, convert_str_to_csv
 from lnco_transcribe.utils.preprocessing_helpers import preprocessing_csv
@@ -31,7 +32,7 @@ def process_audio_file(audio_file, directory, whisper_model, language, task=None
     start_time = time.time()
 
     command = [
-        "python",
+        sys.executable,
         os.path.join(os.path.dirname(__file__), 'whisper_diarization', 'diarize.py'),
         "-a", audio_file,
         "-d", output_dir,

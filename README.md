@@ -3,7 +3,7 @@
 A lightweight and efficient CLI tool for converting audio interviews into structured text, featuring speaker diarization and multi-language support.
 
 This repository is a packaged version of the [Automatic Interviews Processing project](https://github.com/AfroDeivid/automatic-interviews-processing).
-The original project covers a broader workflow, including text preprocessing, transcript evaluation, text analysis, and topic modeling. However, this repository focuses exclusively on the **Audio-to-Text** module, making it easily installable and deployable via ``PyPI``.
+The original project covers a broader workflow, including text preprocessing, transcript evaluation, text analysis, and topic modeling. However, this repository focuses exclusively on the **Audio-to-Text** module.
 
 Developed by [David Friou](https://github.com/AfroDeivid) as part of a semester project at [LNCO Lab](https://www.epfl.ch/labs/lnco/).
 
@@ -32,23 +32,38 @@ Ensure that FFMPEG is added to your system’s PATH.
 
 - Python >= ``3.10`` is required.
 
-## 2.1 Install via ``pip``
+## 2. Installation Options
+
+###  Option 1: Install with ``Poetry``
+
+This ensures all dependencies are resolved and the CLI (`lnco-transcribe`) is installed correctly.
+
+- If you don’t have Poetry installed, install it globally:
 
 ```
-pip install lnco-transcribe
+ pip install poetry
 ``` 
-OR
-If Pypi version don't working:
+- Install the project and dependencies:
 ```
-pip install .\dist\lnco_transcribe-1.0.0-py3-none-any.whl
+poetry install
 ```
 
-## 2.2 Install Manually with a Virtual Environment
+*When using Poetry, the CLI is only available inside the environment. Remember to ``use poetry run`` or ``poetry shell``.*
 
-If you want to manually manage dependencies, create an environment and install dependencies:
+## Option 2: Install Locally with pip
+
+Create an environment and install the package from source (same effect as Poetry, but without Poetry itself):
+
+```
+pip install .
+```
+
+## Option 3: Manual Dependency Install
+
+If you want to manually manage dependencies, create an environment and install dependencies (the CLI won’t be available) :
 
 **Locked Environment Installation**  
-This setup recreates the *exact environment* used during my semester project:
+This setup recreates the *exact environment* used:
 ```
 conda create --name tti python=3.10 --yes
 conda activate tti
@@ -61,6 +76,28 @@ If you need more flexibility, like updating certain packages or adapting the rep
 pip install cython
 pip install -c constraints.txt -r requirements.txt 
 ``` 
+
+## Running the CLI Tool
+
+Depending on your install method:
+
+- If installed via ``Poetry`` or with ``pip install .`` :
+
+You can run the CLI directly using:
+
+```
+lnco-transcribe -d path_to_folder --whisper-model large-v3 --language en
+```
+
+- If installed manually via ``requirements.txt`` :
+
+The CLI entry point won’t be available. Run the module directly instead:
+
+```
+python -m lnco_transcribe.run_diarize -d path_to_folder --whisper-model large-v3 --language en
+```
+
+*All CLI examples below assume that the package has been installed using ``Poetry`` or via ``pip install .`` and that you're inside an activated environment.*
 
 # Usage
 
@@ -75,8 +112,8 @@ The pipeline supports nested folder structures, making it easy to process multip
 To transcribe audio files with speaker diarization, use:
 
 - **Transcribe audio in its original language :** *(specified with --language)* 
+  
 ```bash
-
 lnco-transcribe -d path_to_folder --whisper-model large-v3 --language en
 ```
 
