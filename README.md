@@ -86,7 +86,7 @@ Depending on your install method:
 You can run the CLI directly using:
 
 ```
-lnco-transcribe -d path_to_folder --whisper-model large-v3 --language en
+poetry run lnco-transcribe -d path_to_folder --whisper-model large-v3 --language en
 ```
 
 - If installed manually via ``requirements.txt`` :
