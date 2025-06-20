@@ -14,7 +14,11 @@ def process_audio_file(audio_file, directory, whisper_model, language, task=None
     experiment_name = os.path.basename(os.path.normpath(directory))  # Extract only the last folder name
     relative_path = os.path.relpath(audio_file, directory)
 
-    output_dir = os.path.join("results", experiment_name, os.path.dirname(relative_path))
+    if task == "translate":
+        output_dir = os.path.join("results", experiment_name, f"{language}_to_eng", os.path.dirname(relative_path))
+    else:
+        output_dir = os.path.join("results", experiment_name, os.path.dirname(relative_path))
+
     os.makedirs(output_dir, exist_ok=True)  # Ensure the output directory exists
 
     base_name = os.path.splitext(os.path.basename(audio_file))[0] # Get the file name without extension
@@ -88,6 +92,11 @@ def main():
             "you can use the 'translate' task."
     )
     parser.add_argument(
+    "--also-transcribe",
+    action="store_true",
+    help="When task is 'translate', also perform a transcription in the original language."
+    )
+    parser.add_argument(
         "-e", "--extensions",
         type=str,
         nargs='+', # can give multiples arguments separate by a space
@@ -112,7 +121,19 @@ def main():
     # Process each audio file
     str_files = []
     for audio_file in audio_files:
-        str_file = process_audio_file(audio_file, args.directory, args.whisper_model, args.language, args.task, args.overwrite)
+        # Step 1: (Optional) Transcribe in original language before translating
+        if args.task == "translate" and args.also_transcribe:
+            print(f"\nAlso transcribing {audio_file} in original language ({args.language})")
+            str_file_transcribe = process_audio_file(audio_file, args.directory, args.whisper_model, args.language, 
+                                                     task="transcribe", overwrite=args.overwrite)
+            if str_file_transcribe:
+                str_files.append(str_file_transcribe)
+                # Preprocessing version of the csv, inside `results/processed`
+                preprocessing_csv(str_file_transcribe)
+
+        # Step 2: Main task (either transcribe or translate)
+        str_file = process_audio_file(audio_file, args.directory, args.whisper_model, args.language, 
+                                      task="translate" if args.task == "translate" else args.task, overwrite=args.overwrite)
         if str_file:
             str_files.append(str_file)
             # Preprocessing version of the csv, inside `results/processed`

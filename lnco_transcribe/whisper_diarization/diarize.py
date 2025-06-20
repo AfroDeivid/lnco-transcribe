@@ -153,7 +153,7 @@ suppress_tokens = (
 
 if args.batch_size > 0:
     transcript_segments, info = whisper_pipeline.transcribe(
-        audio_waveform,
+        audio_waveform,  # type: ignore
         language,
         suppress_tokens=suppress_tokens,
         batch_size=args.batch_size,
@@ -161,7 +161,7 @@ if args.batch_size > 0:
     )
 else:
     transcript_segments, info = whisper_model.transcribe(
-        audio_waveform,
+        audio_waveform,  # type: ignore
         language,
         suppress_tokens=suppress_tokens,
         vad_filter=True,
@@ -221,7 +221,7 @@ torchaudio.save(
 
 
 # Initialize NeMo MSDD diarization model
-msdd_model = NeuralDiarizer(cfg=create_config(temp_path)).to(args.device)
+msdd_model = NeuralDiarizer(cfg=create_config(temp_path)).to(args.device)  # type: ignore
 msdd_model.diarize()
 
 del msdd_model

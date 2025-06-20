@@ -50,7 +50,7 @@ poetry install
 
 *When using Poetry, the CLI is only available inside the environment. Remember to ``use poetry run`` or ``poetry shell``.*
 
-## Option 2: Install Locally with pip
+### Option 2: Install Locally with pip
 
 Create an environment and install the package from source (same effect as Poetry, but without Poetry itself):
 
@@ -58,7 +58,7 @@ Create an environment and install the package from source (same effect as Poetry
 pip install .
 ```
 
-## Option 3: Manual Dependency Install
+### Option 3: Manual Dependency Install
 
 If you want to manually manage dependencies, create an environment and install dependencies (the CLI won’t be available) :
 
@@ -121,6 +121,9 @@ lnco-transcribe -d path_to_folder --whisper-model large-v3 --language en
 ```bash
 lnco-transcribe -d path_to_folder --whisper-model large-v3 --language fr --task translate
 ```
+- Optionally add ``--also-transcribe`` to also save a transcript in the original language alongside the translated one. Outputs will be saved to:
+  - ``results/<experiment>/<subfolders...>`` for original transcription
+  - ``results/<experiment>/fr_to_eng/<subfolders...>`` for translated version
 
 If only ``language`` is specified, the model will attempt to translate any detected language into the specified language.
 
@@ -134,6 +137,7 @@ To improve performance, specify the task as ``translate`` if you know in advance
 | **`--whisper_model`** | Name of the Whisper model used for transcription.   | None                      |
 | **``--language ``**       | Language code for transcription (e.g., `fra` for French, `eng` for English). | None                            |
 | **``--task ``**           | Task to perform (e.g., "transcribe", "translate").  | None                            |
+| **``--also-transcribe``**           | When using ``--task translate``, also transcribes the audio in the original language before translation.  | False                            |
 | **``-e, --extensions``**      | List of allowed audio file extensions.              | [".m4a", ".mp4", ".wav"]        |
 | **``--overwrite``**       | Overwrites existing transcriptions if specified.    | False                           |
 
@@ -166,7 +170,7 @@ This section focuses on converting raw audio data into text through transcriptio
 
 - **Preprocessing and Conversion:**  
   - [pre_analysis.ipynb](lnco-transcribe/pre_analysis.ipynb): Analyzes audio files and experiment structure.  
-  - [MTS_to_audio.py](lnco-transcribe/MTS_to_audio.py): Converts `.MTS` videos into `.wav` format for processing.  
+  - [videos_to_audio.py](lnco-transcribe/MTS_to_audio.py): Converts videos formats (`.MTS`,`.mp4`) into `.wav` format for processing.  
 
 - **Transcription & Diarization:**  
   - [run_diarize.py](lnco-transcribe/run_diarize.py): The main script for batch-processing transcription and speaker diarization.  
