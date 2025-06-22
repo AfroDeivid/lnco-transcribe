@@ -3,6 +3,9 @@ import logging
 import os
 import re
 
+import sys
+import subprocess
+
 import faster_whisper
 import torch
 import torchaudio
@@ -113,9 +116,12 @@ language = process_language_arg(args.language, args.model_name)
 if args.stemming:
     # Isolate vocals from the rest of the audio
 
-    return_code = os.system(
-        f'python -m demucs.separate -n htdemucs --two-stems=vocals "{args.audio}" -o temp_outputs --device "{args.device}"'
-    )
+    return_code = subprocess.call([
+        sys.executable, "-m", "demucs.separate",
+        "-n", "htdemucs", "--two-stems=vocals", args.audio,
+        "-o", "temp_outputs",
+        "--device", args.device
+    ])
 
     if return_code != 0:
         logging.warning(
