@@ -648,3 +648,52 @@ def match_transcripts_folder(reference_dir, target_dir, output_dir):
                     df_ref.to_csv(output_file_path, index=False, encoding='utf-8-sig')
                 else:
                     print(f"Matching file not found for {reference_file_path}")
+
+def extract_part_number(filename):
+    match = re.search(r'part\s*(\d+)', filename, re.IGNORECASE)
+    return int(match.group(1)) if match else float('inf')
+
+def merge_csv_parts_and_copy_others(source_dir, output_dir):
+    """
+    Merges 'part' CSV files per subdirectory into one file.
+    Copies all other CSVs (e.g., follow-ups) to the same output directory.
+    """
+    os.makedirs(output_dir, exist_ok=True)
+    for subdir in sorted(os.listdir(source_dir)):
+        subdir_path = os.path.join(source_dir, subdir)
+        if not os.path.isdir(subdir_path):
+            continue
+
+        print(f"📂 Processing: {subdir}")
+        all_csvs = [f for f in os.listdir(subdir_path) if f.lower().endswith('.csv')]
+        part_csvs = [f for f in all_csvs if 'part' in f.lower()]
+        other_csvs = [f for f in all_csvs if 'part' not in f.lower()]
+
+        # Merge 'part' files
+        if part_csvs:
+            part_csvs.sort(key=extract_part_number)
+            print("    Merging files:")
+            for f in part_csvs:
+                print(f"      - {f}")
+            try:
+                csv_paths = [os.path.join(subdir_path, f) for f in part_csvs]
+                df_list = [pd.read_csv(path) for path in csv_paths]
+                merged_df = pd.concat(df_list, ignore_index=True)
+                merged_filename = f"{subdir}_interview_merged.csv"
+                merged_path = os.path.join(output_dir, merged_filename)
+                merged_df.to_csv(merged_path, index=False)
+                print(f"   ✅ Saved merged file: {merged_filename}")
+            except Exception as e:
+                print(f"   ❌ Error merging parts: {e}")
+
+        else:
+            print("   ⚠️ No 'part' files to merge.")
+
+        # Copy non-'part' CSVs
+        if other_csvs:
+            for f in other_csvs:
+                src_path = os.path.join(subdir_path, f)
+                dst_path = os.path.join(output_dir, f"{subdir}__{f}")
+                shutil.copy(src_path, dst_path)
+                print(f"      Copied: {f} → {os.path.basename(dst_path)}")
+        print()
