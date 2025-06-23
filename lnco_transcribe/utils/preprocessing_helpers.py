@@ -599,7 +599,7 @@ def match_transcripts(reference_df, target_df):
         else:
             # Single speaker
             target_content_str = ' '.join(group_sorted['Content'])
-        target_content_list[int(ref_idx)] = target_content_str
+        target_content_list[int(ref_idx)] = target_content_str # type: ignore
 
     return target_content_list
 
@@ -664,6 +664,9 @@ def merge_csv_parts_and_copy_others(source_dir, output_dir):
         if not os.path.isdir(subdir_path):
             continue
 
+        sub_output_dir = os.path.join(output_dir, subdir)
+        os.makedirs(sub_output_dir, exist_ok=True)
+
         print(f"📂 Processing: {subdir}")
         all_csvs = [f for f in os.listdir(subdir_path) if f.lower().endswith('.csv')]
         part_csvs = [f for f in all_csvs if 'part' in f.lower()]
@@ -680,7 +683,10 @@ def merge_csv_parts_and_copy_others(source_dir, output_dir):
                 df_list = [pd.read_csv(path) for path in csv_paths]
                 merged_df = pd.concat(df_list, ignore_index=True)
                 merged_filename = f"{subdir}_interview_merged.csv"
-                merged_path = os.path.join(output_dir, merged_filename)
+
+                os.makedirs(sub_output_dir, exist_ok=True)
+                merged_path = os.path.join(sub_output_dir, merged_filename)
+
                 merged_df.to_csv(merged_path, index=False)
                 print(f"   ✅ Saved merged file: {merged_filename}")
             except Exception as e:
@@ -693,7 +699,7 @@ def merge_csv_parts_and_copy_others(source_dir, output_dir):
         if other_csvs:
             for f in other_csvs:
                 src_path = os.path.join(subdir_path, f)
-                dst_path = os.path.join(output_dir, f"{subdir}__{f}")
+                dst_path = os.path.join(sub_output_dir, f)
                 shutil.copy(src_path, dst_path)
                 print(f"      Copied: {f} → {os.path.basename(dst_path)}")
         print()
