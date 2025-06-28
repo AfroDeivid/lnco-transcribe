@@ -3,9 +3,16 @@ import subprocess
 import time
 import argparse
 import sys
+import psutil
+import gc
 
 from lnco_transcribe.utils.format_helpers import get_files, convert_str_to_csv
 from lnco_transcribe.utils.preprocessing_helpers import preprocessing_csv
+
+def log_memory_usage(context=""):
+    process = psutil.Process()
+    rss = process.memory_info().rss / 1024**2  # in MB
+    print(f"[MEM] After {context}: RSS={rss:.1f} MB")
 
 def process_audio_file(audio_file, directory, whisper_model, language, task=None, overwrite=False):
     """Process a single audio file with the diarization script."""
@@ -126,14 +133,19 @@ def main():
             print(f"\nAlso transcribing {audio_file} in original language ({args.language})")
             str_file_transcribe = process_audio_file(audio_file, args.directory, args.whisper_model, args.language, 
                                                      task="transcribe", overwrite=args.overwrite)
+            log_memory_usage(f"transcribe {audio_file}")
+
             if str_file_transcribe:
                 str_files.append(str_file_transcribe)
                 # Preprocessing version of the csv, inside `results/processed`
                 preprocessing_csv(str_file_transcribe)
+        time.sleep(2)  # Give OS time to clean up
+        gc.collect()
 
         # Step 2: Main task (either transcribe or translate)
         str_file = process_audio_file(audio_file, args.directory, args.whisper_model, args.language, 
                                       task="translate" if args.task == "translate" else args.task, overwrite=args.overwrite)
+        log_memory_usage(f"translate {audio_file}")
         if str_file:
             str_files.append(str_file)
             # Preprocessing version of the csv, inside `results/processed`

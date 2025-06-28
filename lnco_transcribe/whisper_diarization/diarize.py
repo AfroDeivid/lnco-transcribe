@@ -5,6 +5,7 @@ import re
 
 import sys
 import subprocess
+import gc
 
 import faster_whisper
 import torch
@@ -179,6 +180,7 @@ full_transcript = "".join(segment.text for segment in transcript_segments)
 # clear gpu vram
 del whisper_model, whisper_pipeline
 torch.cuda.empty_cache()
+gc.collect()
 
 # Forced Alignment
 alignment_model, alignment_tokenizer = load_alignment_model(
@@ -196,6 +198,7 @@ emissions, stride = generate_emissions(
 
 del alignment_model
 torch.cuda.empty_cache()
+gc.collect()
 
 tokens_starred, text_starred = preprocess_text(
     full_transcript,
@@ -232,6 +235,7 @@ msdd_model.diarize()
 
 del msdd_model
 torch.cuda.empty_cache()
+gc.collect()
 
 # Reading timestamps <> Speaker Labels mapping
 
