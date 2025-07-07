@@ -11,6 +11,8 @@ import faster_whisper
 import torch
 import torchaudio
 
+#os.environ["TRANSFORMERS_OFFLINE"] = "1" # Uncomment this line to use local models only
+
 from ctc_forced_aligner import (
     generate_emissions,
     get_alignments,

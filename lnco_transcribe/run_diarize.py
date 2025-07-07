@@ -5,6 +5,7 @@ import argparse
 import sys
 import psutil
 import gc
+from datetime import datetime
 
 from lnco_transcribe.utils.format_helpers import get_files, convert_str_to_csv
 from lnco_transcribe.utils.preprocessing_helpers import preprocessing_csv
@@ -13,6 +14,12 @@ def log_memory_usage(context=""):
     process = psutil.Process()
     rss = process.memory_info().rss / 1024**2  # in MB
     print(f"[MEM] After {context}: RSS={rss:.1f} MB")
+
+def write_log(message, log_path="processing_log.txt"):
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    with open(log_path, "a") as f:
+        f.write(f"[{timestamp}] {message}\n")
+
 
 def process_audio_file(audio_file, directory, whisper_model, language, task=None, overwrite=False):
     """Process a single audio file with the diarization script."""
@@ -38,6 +45,7 @@ def process_audio_file(audio_file, directory, whisper_model, language, task=None
         return None
     
     print(f"Processing {audio_file}...")
+    write_log(f"Started processing {audio_file}")
 
     # Start the timer
     start_time = time.time()
@@ -58,8 +66,9 @@ def process_audio_file(audio_file, directory, whisper_model, language, task=None
     # End the timer
     end_time = time.time()
     elapsed_time = end_time - start_time
-    print(f"\n\n Finished processing {audio_file} in {int(elapsed_time // 60)} min and {elapsed_time % 60:.0f} sec")
-
+    finished_message = f"Finished processing {audio_file} in {int(elapsed_time // 60)} min and {elapsed_time % 60:.0f} sec"
+    print(f"\n\n {finished_message}")
+    write_log(finished_message)
     # Convert .str file to .csv format
     convert_str_to_csv(str_file, experiment_name)
 

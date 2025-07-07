@@ -530,21 +530,40 @@ def match_transcripts(reference_df, target_df):
         s, ms = s_ms.split(",")
         total_ms = (int(h) * 3600 + int(m) * 60 + int(s)) * 1000 + int(ms)
         return total_ms
+    
+    def check_and_fix_intervals(df, label):
+        # Find invalid rows
+        invalid_rows = df[df['Start_ms'] > df['End_ms']].copy()
+        
+        if not invalid_rows.empty:
+            print(f"\n⚠️ Found invalid intervals in {label}:")
+            print(invalid_rows[['Start Time', 'End Time', 'Start_ms', 'End_ms']])
+            
+            # Option 1: Swap Start_ms and End_ms where needed
+            df.loc[df['Start_ms'] > df['End_ms'], ['Start_ms', 'End_ms']] = \
+                df.loc[df['Start_ms'] > df['End_ms'], ['End_ms', 'Start_ms']].values
+            
+            print(f"✅ Fixed by swapping Start_ms and End_ms in {label}.")
+
+        return df
 
     # Convert timestamps to milliseconds
     reference_df['Start_ms'] = reference_df['Start Time'].apply(time_to_ms)
     reference_df['End_ms'] = reference_df['End Time'].apply(time_to_ms)
     target_df['Start_ms'] = target_df['Start Time'].apply(time_to_ms)
     target_df['End_ms'] = target_df['End Time'].apply(time_to_ms)
-
     
+    # Check & fix bad intervals BEFORE building IntervalIndex
+    reference_df = check_and_fix_intervals(reference_df, "reference_df")
+    target_df = check_and_fix_intervals(target_df, "target_df")
+    
+    # Now safe to build intervals
     ref_intervals = pd.IntervalIndex.from_arrays(reference_df['Start_ms'], reference_df['End_ms'], closed='both')    
-
     ref_df_intervals = reference_df[['Start_ms', 'End_ms']].copy()
     ref_df_intervals['ref_index'] = ref_df_intervals.index
     tar_df_intervals = target_df[['Start_ms', 'End_ms']].copy()
     tar_df_intervals['tar_index'] = tar_df_intervals.index
-
+    
     # Build a dataframe of overlaps
     overlaps = []
     for idx, row in tar_df_intervals.iterrows():
@@ -587,19 +606,21 @@ def match_transcripts(reference_df, target_df):
 
     # Prepare the target content list aligned with reference_df
     target_content_list = [None] * len(reference_df)
-
+    
     for ref_idx, group in grouped:
         # Get the sorted target contents
         group_sorted = group.sort_values('Start_ms')
+        group_sorted['Content'] = group_sorted['Content'].fillna('').astype(str)
         speakers = group_sorted['Speaker'].unique()
+
         if len(speakers) > 1:
             # Annotate speakers
             speaker_contents = group_sorted.groupby('Speaker')['Content'].apply(' '.join)
             target_content_str = ' '.join(f'Speaker {sp}: {cnt}' for sp, cnt in speaker_contents.items())
         else:
-            # Single speaker
+            # Single speaker case
             target_content_str = ' '.join(group_sorted['Content'])
-        target_content_list[int(ref_idx)] = target_content_str # type: ignore
+        target_content_list[int(ref_idx)] = target_content_str
 
     return target_content_list
 
